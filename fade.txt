@@ -1,0 +1,60 @@
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState // Import for animating float values like alpha
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Alignment
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            // Set the content view to our composable function
+            AnimatedVisibilityExample()
+        }
+    }
+}
+
+@Composable
+fun AnimatedVisibilityExample() {
+    // State variable to toggle visibility
+    var visible by remember { mutableStateOf(false) }
+
+    // This is where the animation happens: we animate the alpha (opacity) of the text.
+    // `animateFloatAsState` will animate the float value from 0f (transparent) to 1f (fully opaque).
+    val alpha by animateFloatAsState(targetValue = if (visible) 1f else 0f)
+
+    // Column layout that centers its children horizontally
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(16.dp) // Padding around the entire Column
+    ) {
+        // A Button that toggles the visibility of the text when clicked
+        Button(onClick = { visible = !visible }) {
+            Text("Toggle Fade")
+        }
+
+        // The text that will fade in and out
+        Text(
+            text = "I will fade in and out!",
+            modifier = Modifier.padding(top = 20.dp), // Add some top padding to the text
+            color = Color.Black.copy(alpha = alpha) // Modify the alpha (opacity) of the text color
+        )
+    }
+}
+
+// Preview function to render this composable in Android Studio for testing
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    AnimatedVisibilityExample() // Display the AnimatedVisibilityExample composable
+}
+

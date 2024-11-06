@@ -1,0 +1,67 @@
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState // Import to animate DP values like offset
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Alignment
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            // Set the content view to our composable function
+            SlideInSlideOutExample()
+        }
+    }
+}
+
+@Composable
+fun SlideInSlideOutExample() {
+    // State variable to toggle visibility of the sliding box
+    var visible by remember { mutableStateOf(false) }
+
+    // This is where the slide animation happens: we animate the horizontal offset (x) of the box.
+    // `animateDpAsState` will animate the offset value from 300.dp (off-screen) to 0.dp (on-screen).
+    val slideInOffset by animateDpAsState(targetValue = if (visible) 0.dp else 300.dp)
+
+    // Column layout to center the button and the sliding box
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(16.dp) // Padding around the entire Column
+    ) {
+        // Button to toggle the visibility of the sliding box
+        Button(onClick = { visible = !visible }) {
+            Text("Toggle Slide")
+        }
+
+        // The Box that will slide in and out of view
+        Box(
+            modifier = Modifier
+                .padding(top = 20.dp) // Add padding above the box
+                .offset(x = slideInOffset) // Apply the animated horizontal offset
+                .fillMaxWidth() // Make the Box fill the available width
+                .height(50.dp) // Set the height of the Box
+        ) {
+            // The text that will appear inside the box
+            Text(
+                text = "I will slide in and out!",
+                modifier = Modifier.align(Alignment.Center), // Center the text inside the Box
+                color = androidx.compose.ui.graphics.Color.Black // Set the text color
+            )
+        }
+    }
+}
+
+// Preview function to render this composable in Android Studio for testing
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    SlideInSlideOutExample() // Display the SlideInSlideOutExample composable
+}
+
