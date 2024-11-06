@@ -1,0 +1,105 @@
+package com.example.mastermindgame
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import android.util.Log 
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.withStyle
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MainScreen { startGame() }
+        }
+    }
+
+    // Function to start the GameActivity
+    private fun startGame() {
+        val intent = Intent(this, GameActivity::class.java)
+        startActivity(intent)
+    }
+}
+
+@Composable
+fun MainScreen(onPlayClick: () -> Unit) {
+    // #1 State Initialization
+    var fadeInStarted by remember { mutableStateOf(false) }
+
+    // #2 Animate Opacity
+    val opacity by animateFloatAsState(
+        targetValue = if (fadeInStarted) 1f else 0f,
+        animationSpec = tween(durationMillis = 2000) // Increased duration for better visibility
+    )
+
+    // #3 Triggering the Animation with LaunchedEffect
+    LaunchedEffect(Unit) {
+        // Log to confirm that LaunchedEffect is triggering
+        Log.d("FadeInEffect", "Fade-in started")
+        fadeInStarted = true
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                val colors = listOf(
+                    Color.Red,
+                    Color.Blue,
+                    Color.Green,
+                    Color.Magenta,
+                    Color.Cyan,
+                    Color.Red,
+                    Color.Blue,
+                    Color.Green,
+                    Color.Magenta,
+                    Color.Cyan
+                )
+                "MASTERMIND".forEachIndexed { index, char ->
+                    withStyle(style = androidx.compose.ui.text.SpanStyle(
+                        color = colors[index % colors.size],
+                        fontFamily = FontFamily.SansSerif,
+                        fontSize = 50.sp
+                    )) {
+                        append(char.toString())
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                    // #4 Displaying the Title with Animated Opacity
+                .alpha(opacity)
+        )
+
+        // Button to start the game
+        Button(
+            onClick = { onPlayClick() },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2196F3),
+                contentColor = Color(0xFF0D47A1)
+            )
+        ) {
+            Text(text = "Press Here To Play!")
+        }
+    }
+}
+
